@@ -1,0 +1,89 @@
+<Window x:Class="AnzenSecurityWatcher.AlertPopupWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{DynamicResource Loc_Alert_WindowTitle}"
+        Width="440" Height="235"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        ShowInTaskbar="False"
+        ResizeMode="NoResize">
+    <Border CornerRadius="10"
+            Background="#1E1418"
+            BorderBrush="#FF4455"
+            BorderThickness="2"
+            Margin="8">
+        <Border.Effect>
+            <DropShadowEffect Color="#FF0022" BlurRadius="16" ShadowDepth="0" Opacity="0.65"/>
+        </Border.Effect>
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Background="#FF334B" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                        <TextBlock Text="{DynamicResource Loc_Alert_Badge}" Foreground="White" FontWeight="Bold" FontSize="12"/>
+                    </Border>
+                    <TextBlock Text="Anzen Security Watcher" Foreground="#F0A8B0" FontSize="12" VerticalAlignment="Center"/>
+                </StackPanel>
+                <Button Grid.Column="1" Content="✕" Width="26" Height="26"
+                        Background="Transparent" Foreground="#CCCCCC" BorderThickness="0"
+                        Cursor="Hand" Click="CloseButton_Click" ToolTip="{DynamicResource Loc_Settings_CloseBtn}"/>
+            </Grid>
+
+            <!-- Body -->
+            <StackPanel Grid.Row="1" Margin="0,12,0,10">
+                <TextBlock x:Name="ToolTitleText"
+                           Text="Screen sharing or remote connection detected!"
+                           Foreground="#FFFFFF"
+                           FontSize="15"
+                           FontWeight="Bold"
+                           TextWrapping="Wrap"/>
+                <TextBlock x:Name="EvidenceText"
+                           Text="Process: AnyDesk.exe (PID: 4120)"
+                           Foreground="#FFD0D6"
+                           FontSize="12"
+                           Margin="0,6,0,0"
+                           TextWrapping="Wrap"/>
+                <TextBlock x:Name="EndpointText"
+                           Text="Remote: 198.51.100.42:7070"
+                           Foreground="#FF99A8"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           Margin="0,4,0,0"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+
+            <!-- Footer Buttons -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="{DynamicResource Loc_Alert_InspectBtn}"
+                        Padding="12,6"
+                        Margin="0,0,8,0"
+                        Background="#FF334B"
+                        Foreground="White"
+                        FontWeight="Bold"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Click="InspectButton_Click"/>
+                <Button Content="{DynamicResource Loc_Alert_AckCloseBtn}"
+                        Padding="12,6"
+                        Background="#35282D"
+                        Foreground="#E0E0E0"
+                        BorderBrush="#66444D"
+                        BorderThickness="1"
+                        Cursor="Hand"
+                        Click="CloseButton_Click"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

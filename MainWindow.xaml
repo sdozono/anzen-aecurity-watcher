@@ -1,0 +1,754 @@
+<Window x:Class="AnzenSecurityWatcher.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Anzen Security Watcher"
+        Height="560" Width="860"
+        MinHeight="320" MinWidth="440"
+        Background="{DynamicResource WindowBgBrush}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <!-- Theme-Aware Modern Button Style -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource ButtonBgBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushSecondary}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="9,4"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource ButtonHoverBgBrush}"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource TextAccentBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="#1F6FEB"/>
+            <Setter Property="BorderBrush" Value="#388BFD"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+
+        <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="#B4232C"/>
+            <Setter Property="BorderBrush" Value="#F85149"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+
+        <!-- DataGrid Theme-Aware Style -->
+        <Style TargetType="DataGrid">
+            <Setter Property="Background" Value="{DynamicResource PanelBgBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushPrimary}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="RowBackground" Value="{DynamicResource GridRowBgBrush}"/>
+            <Setter Property="AlternatingRowBackground" Value="{DynamicResource GridAltRowBgBrush}"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource GridLineBrush}"/>
+            <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource GridLineBrush}"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="CanUserAddRows" Value="False"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="RowHeight" Value="29"/>
+        </Style>
+
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="{DynamicResource GridHeaderBgBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextSubHeaderBrush}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushPrimary}"/>
+            <Setter Property="BorderThickness" Value="0,0,1,1"/>
+        </Style>
+
+        <Style TargetType="DataGridCell">
+            <Setter Property="Padding" Value="5,3"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridCell">
+                        <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource GridSelectedBgBrush}"/>
+                    <Setter Property="Foreground" Value="{DynamicResource GridSelectedFgBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Windows Standard Menu Theme Support -->
+        <Style TargetType="Menu">
+            <Setter Property="Background" Value="{DynamicResource HeaderBgBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="FontSize" Value="12.5"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ==================== 1. WINDOWS STANDARD MENU BAR ==================== -->
+        <Border Grid.Row="0" Background="{DynamicResource HeaderBgBrush}" BorderBrush="{DynamicResource BorderBrushPrimary}" BorderThickness="0,0,0,1" Padding="4,2">
+            <DockPanel LastChildFill="False">
+                <Menu DockPanel.Dock="Left" VerticalAlignment="Center" Background="Transparent">
+                    <MenuItem Header="{DynamicResource Loc_Menu_File}">
+                        <MenuItem Header="{DynamicResource Loc_Menu_File_Snapshot}" Click="AddSystemSnapshotLog_Click"/>
+                        <MenuItem Header="{DynamicResource Loc_Menu_File_CopyPrompt}" Click="CopyAiPromptButton_Click"/>
+                        <Separator/>
+                        <MenuItem Header="{DynamicResource Loc_Menu_File_Exit}" Click="ExitMenuItem_Click"/>
+                    </MenuItem>
+                    <MenuItem Header="{DynamicResource Loc_Menu_Monitor}">
+                        <MenuItem Header="{DynamicResource Loc_Menu_Monitor_Refresh}" Click="ManualRefreshButton_Click"/>
+                        <MenuItem x:Name="PauseResumeMenuItem" Header="{DynamicResource Loc_Menu_Monitor_Pause}" Click="TogglePauseButton_Click"/>
+                        <Separator/>
+                        <MenuItem Header="{DynamicResource Loc_Menu_Monitor_ClearSim}" Click="ClearSimulationButton_Click"/>
+                    </MenuItem>
+                    <MenuItem Header="{DynamicResource Loc_Menu_View}">
+                        <MenuItem Header="{DynamicResource Loc_Menu_View_Tab0}" Click="SwitchTab0_Click"/>
+                        <MenuItem Header="{DynamicResource Loc_Menu_View_Tab1}" Click="SwitchTab1_Click"/>
+                        <MenuItem Header="{DynamicResource Loc_Menu_View_Tab2}" Click="SwitchTab2_Click"/>
+                        <MenuItem Header="{DynamicResource Loc_Menu_View_Tab3}" Click="SwitchTab3_Click"/>
+                        <MenuItem Header="{DynamicResource Loc_Menu_View_Tab4}" Click="SwitchTab4_Click"/>
+                    </MenuItem>
+                    <MenuItem Header="{DynamicResource Loc_Menu_Tools}">
+                        <MenuItem Header="{DynamicResource Loc_Tool_TaskMgr}" Tag="taskmgr.exe" Click="LaunchWindowsTool_Click"/>
+                        <MenuItem Header="{DynamicResource Loc_Tool_EventVwr}" Tag="eventvwr.msc" Click="LaunchWindowsTool_Click"/>
+                        <MenuItem Header="{DynamicResource Loc_Tool_DevMgmt}" Tag="devmgmt.msc" Click="LaunchWindowsTool_Click"/>
+                        <MenuItem Header="{DynamicResource Loc_Tool_Control}" Tag="control.exe" Click="LaunchWindowsTool_Click"/>
+                        <Separator/>
+                        <MenuItem Header="{DynamicResource Loc_Tool_ResMon}" Tag="resmon.exe" Click="LaunchWindowsTool_Click"/>
+                        <MenuItem Header="{DynamicResource Loc_Tool_Firewall}" Tag="wf.msc" Click="LaunchWindowsTool_Click"/>
+                        <MenuItem Header="{DynamicResource Loc_Tool_Defender}" Tag="windowsdefender:" Click="LaunchWindowsTool_Click"/>
+                        <Separator/>
+                        <MenuItem Header="{DynamicResource Loc_Tool_TaskSchd}" Tag="taskschd.msc" Click="LaunchWindowsTool_Click"/>
+                        <MenuItem Header="{DynamicResource Loc_Tool_Services}" Tag="services.msc" Click="LaunchWindowsTool_Click"/>
+                        <MenuItem Header="{DynamicResource Loc_Tool_StartupApps}" Tag="ms-settings:startupapps" Click="LaunchWindowsTool_Click"/>
+                        <Separator/>
+                        <MenuItem Header="{DynamicResource Loc_Tool_CertMgr}" Tag="certmgr.msc" Click="LaunchWindowsTool_Click"/>
+                        <MenuItem Header="{DynamicResource Loc_Tool_LusrMgr}" Tag="lusrmgr.msc" Click="LaunchWindowsTool_Click"/>
+                        <MenuItem Header="{DynamicResource Loc_Tool_PrivacyCam}" Tag="ms-settings:privacy-webcam" Click="LaunchWindowsTool_Click"/>
+                        <MenuItem Header="{DynamicResource Loc_Tool_PrivacyMic}" Tag="ms-settings:privacy-microphone" Click="LaunchWindowsTool_Click"/>
+                        <Separator/>
+                        <MenuItem Header="{DynamicResource Loc_Tool_Ncpa}" Tag="ncpa.cpl" Click="LaunchWindowsTool_Click"/>
+                        <MenuItem Header="{DynamicResource Loc_Tool_AppWiz}" Tag="appwiz.cpl" Click="LaunchWindowsTool_Click"/>
+                        <MenuItem Header="{DynamicResource Loc_Tool_NetPlWiz}" Tag="netplwiz.exe" Click="LaunchWindowsTool_Click"/>
+                    </MenuItem>
+                    <MenuItem Header="{DynamicResource Loc_Menu_Settings}" Click="OpenSettingsMenuItem_Click"/>
+                    <MenuItem Header="{DynamicResource Loc_Menu_Help}">
+                        <MenuItem Header="{DynamicResource Loc_Menu_Help_About}" Click="OpenAboutMenuItem_Click"/>
+                    </MenuItem>
+                </Menu>
+
+                <!-- 右側コンパクトKPIサマリー -->
+                <WrapPanel DockPanel.Dock="Right" VerticalAlignment="Center" Margin="8,0,6,0">
+                    <TextBlock x:Name="KpiDefenseScoreText" Text="🛡️ Score --" Foreground="#2DA44E" FontWeight="Bold" FontSize="11.5" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="KpiConnectionsText" Text="🌐 0" Foreground="{DynamicResource TextAccentBrush}" FontWeight="SemiBold" FontSize="11.5" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="KpiScreenShareText" Text="🖥️ Safe" Foreground="#2DA44E" FontWeight="SemiBold" FontSize="11.5" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="KpiProcessText" Text="⚙️ 0/0/0" Foreground="#BF8700" FontWeight="SemiBold" FontSize="11.5" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="KpiAiLogsText" Text="🤖 Logs 0" Foreground="{DynamicResource TextMutedBrush}" FontWeight="SemiBold" FontSize="11.5" VerticalAlignment="Center"/>
+                </WrapPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- ==================== 2. COMPACT GLOBAL ALERT BANNER ==================== -->
+        <Border x:Name="GlobalAlertBanner" Grid.Row="1"
+                Background="#12261E" BorderBrush="#238636" BorderThickness="0,0,0,1"
+                Padding="10,5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="BannerIconText" Grid.Column="0" Text="✅" FontSize="13.5" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                <TextBlock x:Name="BannerMessageText" Grid.Column="1"
+                           Text="No screen leak or sharing detected (Monitoring RDP / AnyDesk / TeamViewer / VNC / Zoom / Teams)"
+                           Foreground="#7EE787" FontWeight="SemiBold" FontSize="12"
+                           TextWrapping="Wrap" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="6,0,0,0">
+                    <Button x:Name="BannerInspectButton" Style="{StaticResource ModernButton}"
+                            Content="{DynamicResource Loc_Banner_DetailsBtn}" Padding="8,2" FontSize="11"
+                            Click="BannerInspectButton_Click"/>
+                    <Button x:Name="BannerClearSimButton" Style="{StaticResource ModernButton}"
+                            Content="{DynamicResource Loc_Banner_ClearSimBtn}" Padding="8,2" FontSize="11" Margin="4,0,0,0"
+                            Visibility="Collapsed" Click="ClearSimulationButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ==================== 3. MAIN 5 TABS ==================== -->
+        <TabControl x:Name="MainTabControl" Grid.Row="2" Background="{DynamicResource WindowBgBrush}" BorderThickness="0" Margin="6,6,6,4">
+            <TabControl.Resources>
+                <Style TargetType="TabItem">
+                    <Setter Property="Background" Value="{DynamicResource TabInactiveBgBrush}"/>
+                    <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}"/>
+                    <Setter Property="FontSize" Value="12"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="Padding" Value="10,6"/>
+                    <Setter Property="Margin" Value="0,0,4,0"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Border x:Name="Border" Background="{TemplateBinding Background}"
+                                        BorderBrush="{DynamicResource BorderBrushPrimary}" BorderThickness="1,1,1,0"
+                                        CornerRadius="6,6,0,0" Padding="{TemplateBinding Padding}"
+                                        Margin="{TemplateBinding Margin}" Cursor="Hand">
+                                    <ContentPresenter x:Name="ContentSite" ContentSource="Header"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="#1F6FEB"/>
+                                        <Setter TargetName="Border" Property="BorderBrush" Value="#58A6FF"/>
+                                        <Setter Property="Foreground" Value="#FFFFFF"/>
+                                    </Trigger>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="IsMouseOver" Value="True"/>
+                                            <Condition Property="IsSelected" Value="False"/>
+                                        </MultiTrigger.Conditions>
+                                        <Setter TargetName="Border" Property="Background" Value="{DynamicResource TabHoverBgBrush}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                                    </MultiTrigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Resources>
+
+            <!-- ====================================================================== -->
+            <!-- TAB 1: TCP/IP 国別通信モニター -->
+            <!-- ====================================================================== -->
+            <TabItem Header="{DynamicResource Loc_Tab0_Header}">
+                <Grid Background="{DynamicResource PanelBgBrush}" Margin="0,1,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 国別サマリーカード一覧 -->
+                    <Border Grid.Row="0" Background="{DynamicResource SubPanelBgBrush}" BorderBrush="{DynamicResource BorderBrushPrimary}" BorderThickness="0,0,0,1" Padding="8,6">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <DockPanel Grid.Row="0" Margin="0,0,0,4">
+                                <TextBlock Text="{DynamicResource Loc_Tab0_CountryHeader}"
+                                           Foreground="{DynamicResource TextSubHeaderBrush}" FontWeight="Bold" FontSize="11.5" VerticalAlignment="Center"/>
+                                <Button Content="{DynamicResource Loc_Tab0_ShowAllBtn}" Style="{StaticResource ModernButton}"
+                                        Padding="7,1" FontSize="11" HorizontalAlignment="Right"
+                                        Click="ResetCountryFilter_Click"/>
+                            </DockPanel>
+                            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                                <ItemsControl x:Name="CountrySummaryItemsControl">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Margin="0,0,6,0" Padding="9,4" Cursor="Hand"
+                                                    Background="{DynamicResource CardBgBrush}"
+                                                    BorderBrush="{DynamicResource BorderBrushSecondary}" BorderThickness="1"
+                                                    Tag="{Binding CountryCode}" Click="CountryCardButton_Click">
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding DisplayTitle}" Foreground="{DynamicResource TextStrongBrush}" FontWeight="Bold" FontSize="12"/>
+                                                    <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                                        <TextBlock Text="{Binding ConnectionCountText}" Foreground="{DynamicResource TextAccentBrush}" FontSize="11" FontWeight="SemiBold"/>
+                                                        <TextBlock Text="{Binding ProcessCountText}" Foreground="{DynamicResource TextMutedBrush}" FontSize="10.5"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+
+                    <!-- 検索・フィルタバー -->
+                    <Border Grid.Row="1" Background="{DynamicResource HeaderBgBrush}" BorderBrush="{DynamicResource BorderBrushPrimary}" BorderThickness="0,0,0,1" Padding="8,5">
+                        <DockPanel LastChildFill="True">
+                            <Button x:Name="PauseNetworkUpdateButton" DockPanel.Dock="Right"
+                                    Style="{StaticResource ModernButton}" Padding="8,2" FontSize="11.5" Margin="8,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Content="{DynamicResource Loc_Btn_PauseUpdate}"
+                                    ToolTip="{DynamicResource Loc_Btn_PauseUpdate_Tooltip}"
+                                    Click="PauseNetworkUpdateButton_Click"/>
+                            <WrapPanel VerticalAlignment="Center">
+                                <TextBlock Text="{DynamicResource Loc_Tab0_SearchLabel}" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="11.5"/>
+                                <TextBox x:Name="NetworkSearchBox" Width="160" Padding="5,2" FontSize="11.5"
+                                         Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource BorderBrushSecondary}"
+                                         VerticalContentAlignment="Center"
+                                         TextChanged="NetworkFilter_Changed"/>
+                                <CheckBox x:Name="ShowOnlyRiskyNetworkCheck" Content="{DynamicResource Loc_Tab0_RiskyOnly}"
+                                          Foreground="{DynamicResource TextPrimaryBrush}" FontSize="11.5" VerticalAlignment="Center" Margin="10,0,0,0"
+                                          Checked="NetworkFilter_Changed" Unchecked="NetworkFilter_Changed"/>
+                                <CheckBox x:Name="IncludeUdpToolbarCheck" Content="{DynamicResource Loc_Tab0_ShowUdp}"
+                                          IsChecked="True"
+                                          Foreground="{DynamicResource TextPrimaryBrush}" FontSize="11.5" VerticalAlignment="Center" Margin="10,0,0,0"
+                                          Click="IncludeUdpToolbarCheck_Click"/>
+                                <TextBlock x:Name="ActiveCountryFilterLabel" Text="Showing: All Countries"
+                                           Foreground="{DynamicResource TextAccentBrush}" FontWeight="Bold" FontSize="11.5" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                            </WrapPanel>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- 通信リスト DataGrid -->
+                    <DataGrid x:Name="NetworkDataGrid" Grid.Row="2">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn x:Name="Col_Net_Risk" Header="Risk" Binding="{Binding RiskLabel}" Width="82"/>
+                            <DataGridTextColumn x:Name="Col_Net_Proto" Header="Proto" Binding="{Binding Protocol}" Width="52"/>
+                            <DataGridTextColumn x:Name="Col_Net_Country" Header="Country" Binding="{Binding CountryDisplay}" Width="140"/>
+                            <DataGridTextColumn x:Name="Col_Net_Org" Header="Organization / ISP" Binding="{Binding Organization}" Width="150"/>
+                            <DataGridTextColumn x:Name="Col_Net_Proc" Header="Process" Binding="{Binding ProcessName}" Width="118"/>
+                            <DataGridTextColumn x:Name="Col_Net_Pid" Header="PID" Binding="{Binding ProcessId}" Width="52"/>
+                            <DataGridTextColumn x:Name="Col_Net_Endpoint" Header="Remote / Local Endpoint" Binding="{Binding RemoteEndpoint}" Width="140"/>
+                            <DataGridTextColumn x:Name="Col_Net_State" Header="State" Binding="{Binding State}" Width="85"/>
+                            <DataGridTextColumn x:Name="Col_Net_Reason" Header="Reason / Notes" Binding="{Binding RiskReason}" Width="*"/>
+                            <DataGridTemplateColumn x:Name="Col_Net_Action" Header="Action" Width="145">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{DynamicResource Loc_Btn_ToAi}" Style="{StaticResource ModernButton}"
+                                                    Padding="6,1" FontSize="10.5" Margin="0,0,4,0"
+                                                    Click="AddNetworkToAiButton_Click"/>
+                                            <Button Content="{DynamicResource Loc_Btn_CopyIp}" Style="{StaticResource ModernButton}"
+                                                    Padding="6,1" FontSize="10.5"
+                                                    ToolTip="{DynamicResource Loc_Btn_CopyIp_Tooltip}"
+                                                    Click="OpenIpLookupButton_Click"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- ====================================================================== -->
+            <!-- TAB 2: リモート画面共有・RDP監視 -->
+            <!-- ====================================================================== -->
+            <TabItem Header="{DynamicResource Loc_Tab1_Header}">
+                <Grid Background="{DynamicResource PanelBgBrush}" Margin="0,1,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 3カテゴリ監視ステータスカード -->
+                    <UniformGrid Grid.Row="0" Columns="3" Margin="6,6,6,6">
+                        <Border x:Name="CardRdpBorder" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrushPrimary}" BorderThickness="1" CornerRadius="6" Padding="8,6" Margin="0,0,4,0">
+                            <StackPanel>
+                                <TextBlock Text="{DynamicResource Loc_Tab1_CardRdpTitle}" Foreground="{DynamicResource TextSubHeaderBrush}" FontWeight="Bold" FontSize="11.5" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock x:Name="CardRdpStatusText" Text="✅ No connection" Foreground="#2DA44E" FontWeight="Bold" FontSize="12" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="CardRemoteToolBorder" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrushPrimary}" BorderThickness="1" CornerRadius="6" Padding="8,6" Margin="2,0,2,0">
+                            <StackPanel>
+                                <TextBlock Text="{DynamicResource Loc_Tab1_CardRemoteTitle}" Foreground="{DynamicResource TextSubHeaderBrush}" FontWeight="Bold" FontSize="11.5" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock x:Name="CardRemoteToolStatusText" Text="✅ No active session" Foreground="#2DA44E" FontWeight="Bold" FontSize="12" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="CardMeetingBorder" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrushPrimary}" BorderThickness="1" CornerRadius="6" Padding="8,6" Margin="4,0,0,0">
+                            <StackPanel>
+                                <TextBlock Text="{DynamicResource Loc_Tab1_CardMeetingTitle}" Foreground="{DynamicResource TextSubHeaderBrush}" FontWeight="Bold" FontSize="11.5" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock x:Name="CardMeetingStatusText" Text="✅ Not sharing" Foreground="#2DA44E" FontWeight="Bold" FontSize="12" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+
+                    <!-- 検知一覧 DataGrid -->
+                    <DataGrid x:Name="ScreenShareDataGrid" Grid.Row="1">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn x:Name="Col_SS_Status" Header="Current Status" Binding="{Binding StatusBadge}" Width="170"/>
+                            <DataGridTextColumn x:Name="Col_SS_Tool" Header="Tool / Protocol" Binding="{Binding ToolName}" Width="180"/>
+                            <DataGridTextColumn x:Name="Col_SS_Proc" Header="Process" Binding="{Binding ProcessName}" Width="120"/>
+                            <DataGridTextColumn x:Name="Col_SS_Pid" Header="PID" Binding="{Binding ProcessId}" Width="55"/>
+                            <DataGridTextColumn x:Name="Col_SS_Endpoint" Header="Remote Endpoint" Binding="{Binding RemoteEndpoints}" Width="160"/>
+                            <DataGridTextColumn x:Name="Col_SS_Evidence" Header="Detection Evidence" Binding="{Binding Evidence}" Width="*"/>
+                            <DataGridTemplateColumn x:Name="Col_SS_Action" Header="Action" Width="95">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="{DynamicResource Loc_Btn_KillProc}" Style="{StaticResource DangerButton}"
+                                                Padding="6,1" FontSize="10.5"
+                                                Click="KillScreenShareProcessButton_Click"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- ====================================================================== -->
+            <!-- TAB 3: プロセス監視（周期出現・未知プロセス） -->
+            <!-- ====================================================================== -->
+            <TabItem Header="{DynamicResource Loc_Tab2_Header}">
+                <Grid Background="{DynamicResource PanelBgBrush}" Margin="0,1,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- フィルタ・操作バー -->
+                    <Border Grid.Row="0" Background="{DynamicResource HeaderBgBrush}" BorderBrush="{DynamicResource BorderBrushPrimary}" BorderThickness="0,0,0,1" Padding="8,6">
+                        <DockPanel LastChildFill="True">
+                            <Button x:Name="PauseProcessUpdateButton" DockPanel.Dock="Right"
+                                    Style="{StaticResource ModernButton}" Padding="8,2" FontSize="11.5" Margin="8,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Content="{DynamicResource Loc_Btn_PauseUpdate}"
+                                    ToolTip="{DynamicResource Loc_Btn_PauseUpdate_Tooltip}"
+                                    Click="PauseProcessUpdateButton_Click"/>
+                            <WrapPanel VerticalAlignment="Center">
+                                <RadioButton x:Name="ProcFilterAnomalyRadio" Content="{DynamicResource Loc_Tab2_FilterAnomaly}"
+                                             IsChecked="True" Foreground="{DynamicResource TextStrongBrush}" FontWeight="SemiBold" FontSize="11.5" VerticalAlignment="Center" Margin="0,2,10,2"
+                                             Checked="ProcessFilter_Changed"/>
+                                <RadioButton x:Name="ProcFilterTransientRadio" Content="{DynamicResource Loc_Tab2_FilterTransient}"
+                                             Foreground="{DynamicResource TextPrimaryBrush}" FontWeight="SemiBold" FontSize="11.5" VerticalAlignment="Center" Margin="0,2,10,2"
+                                             Checked="ProcessFilter_Changed"/>
+                                <RadioButton x:Name="ProcFilterPeriodicRadio" Content="{DynamicResource Loc_Tab2_FilterPeriodic}"
+                                             Foreground="{DynamicResource TextPrimaryBrush}" FontSize="11.5" VerticalAlignment="Center" Margin="0,2,10,2"
+                                             Checked="ProcessFilter_Changed"/>
+                                <RadioButton x:Name="ProcFilterRareRadio" Content="{DynamicResource Loc_Tab2_FilterRare}"
+                                             Foreground="{DynamicResource TextPrimaryBrush}" FontSize="11.5" VerticalAlignment="Center" Margin="0,2,10,2"
+                                             Checked="ProcessFilter_Changed"/>
+                                <RadioButton x:Name="ProcFilterAllRadio" Content="{DynamicResource Loc_Tab2_FilterAll}"
+                                             Foreground="{DynamicResource TextPrimaryBrush}" FontSize="11.5" VerticalAlignment="Center" Margin="0,2,10,2"
+                                             Checked="ProcessFilter_Changed"/>
+                                <CheckBox x:Name="ExcludeMicrosoftProcCheck" Content="{DynamicResource Loc_Tab2_ExcludeMs}"
+                                          IsChecked="True"
+                                          Foreground="{DynamicResource TextStrongBrush}" FontWeight="SemiBold" FontSize="11.5" VerticalAlignment="Center" Margin="0,2,10,2"
+                                          Checked="ProcessFilter_Changed" Unchecked="ProcessFilter_Changed"/>
+                                <CheckBox x:Name="IncludeHistoricalProcCheck" Content="{DynamicResource Loc_Tab2_IncludeHistorical}"
+                                          IsChecked="False"
+                                          Foreground="{DynamicResource TextStrongBrush}" FontWeight="SemiBold" FontSize="11.5" VerticalAlignment="Center" Margin="0,2,10,2"
+                                          Checked="ProcessFilter_Changed" Unchecked="ProcessFilter_Changed"/>
+
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,0,2">
+                                    <Button x:Name="ScanRecentTasksButton" Content="{DynamicResource Loc_Tab2_ScanTasksBtn}"
+                                            Style="{StaticResource ModernButton}" Padding="7,2" FontSize="11" Margin="0,0,8,0"
+                                            Click="ScanRecentTasksButton_Click"/>
+                                    <TextBlock Text="🔎" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="11.5"/>
+                                    <TextBox x:Name="ProcessSearchBox" Width="125" Padding="4,2" FontSize="11.5"
+                                             Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource BorderBrushSecondary}"
+                                             TextChanged="ProcessSearchBox_TextChanged"/>
+                                    <TextBlock x:Name="ProcessSummaryCountText" Text="0"
+                                               Foreground="{DynamicResource TextAccentBrush}" FontWeight="Bold" FontSize="11.5" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                </StackPanel>
+                            </WrapPanel>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- プロセス監視 DataGrid -->
+                    <DataGrid x:Name="ProcessDataGrid" Grid.Row="1">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn x:Name="Col_Proc_Risk" Header="Risk" Binding="{Binding RiskBadge}" Width="78"/>
+                            <DataGridTextColumn x:Name="Col_Proc_Status" Header="Status / Lifetime" Binding="{Binding RunningStatusText}" Width="145"/>
+                            <DataGridTextColumn x:Name="Col_Proc_Name" Header="Process Name" Binding="{Binding ProcessName}" Width="135"/>
+                            <DataGridTextColumn x:Name="Col_Proc_Parent" Header="Parent Process" Binding="{Binding ParentDisplay}" Width="185"/>
+                            <DataGridTextColumn x:Name="Col_Proc_Period" Header="Periodicity / Timing" Binding="{Binding PeriodicitySummary}" Width="165"/>
+                            <DataGridTextColumn x:Name="Col_Proc_Count" Header="Count" Binding="{Binding TotalSeenCount}" Width="46"/>
+                            <DataGridTextColumn x:Name="Col_Proc_Cmd" Header="Command Line" Binding="{Binding CommandLine}" Width="220"/>
+                            <DataGridTextColumn x:Name="Col_Proc_Reason" Header="Reason / Scheduled Task" Binding="{Binding AnomalyReason}" Width="240"/>
+                            <DataGridTextColumn x:Name="Col_Proc_Sign" Header="Signature / Trust" Binding="{Binding TrustBadge}" Width="160"/>
+                            <DataGridTextColumn x:Name="Col_Proc_Path" Header="Executable Path" Binding="{Binding ExecutablePath}" Width="*"/>
+                            <DataGridTemplateColumn x:Name="Col_Proc_Action" Header="Action" Width="140">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{DynamicResource Loc_Btn_Trust}" Style="{StaticResource ModernButton}"
+                                                    Padding="6,1" FontSize="10.5" Margin="0,0,4,0"
+                                                    Click="TrustProcessButton_Click"/>
+                                            <Button Content="{DynamicResource Loc_Btn_ToAi}" Style="{StaticResource ModernButton}"
+                                                    Padding="6,1" FontSize="10.5"
+                                                    Click="AddProcessToAiButton_Click"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- ====================================================================== -->
+            <!-- TAB 4: システム防御・安全スコア -->
+            <!-- ====================================================================== -->
+            <TabItem Header="{DynamicResource Loc_Tab3_Header}">
+                <Grid Background="{DynamicResource PanelBgBrush}" Margin="0,1,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 上段: 安全スコア＆主要防御ステータスカード -->
+                    <Border Grid.Row="0" Background="{DynamicResource SubPanelBgBrush}" BorderBrush="{DynamicResource BorderBrushPrimary}" BorderThickness="0,0,0,1" Padding="8,6">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- 安全スコアバッジ -->
+                            <Border x:Name="ScoreBadgeBorder" Grid.Column="0" Background="{DynamicResource CardBgBrush}" BorderBrush="#238636" BorderThickness="1.5" CornerRadius="6" Padding="10,4" Margin="0,0,10,0">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock x:Name="ScoreGradeText" Text="A" FontSize="22" FontWeight="ExtraBold" Foreground="#3FB950" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock x:Name="ScoreValueText" Text="Security Score: -- / 100" FontSize="12.5" FontWeight="Bold" Foreground="{DynamicResource TextStrongBrush}"/>
+                                        <TextBlock x:Name="ScoreCommentText" Text="Scanning..." FontSize="10.5" Foreground="{DynamicResource TextMutedBrush}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- サマリー内訳テキスト -->
+                            <WrapPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock x:Name="DefenseSummaryCountsText"
+                                           Text="🚀Autostart:0  👻WMI:0  ⌨️Cmd:0  📷Cam/Mic:0  🎹Key/📋Clip:0  🔌USB/🧩DLL:0  📜Cert/👑Admin:0"
+                                           Foreground="{DynamicResource TextPrimaryBrush}" FontSize="11.5" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                            </WrapPanel>
+
+                            <!-- スコア内訳表示切替ボタン -->
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
+                                <Button x:Name="TogglePostureViewButton" Style="{StaticResource ModernButton}"
+                                        Content="📊 View 10-Item Security Score Checklist" Padding="8,3" FontSize="11"
+                                        Click="TogglePostureViewButton_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- 中段: カテゴリ絞り込みバー -->
+                    <Border Grid.Row="1" Background="{DynamicResource HeaderBgBrush}" BorderBrush="{DynamicResource BorderBrushPrimary}" BorderThickness="0,0,0,1" Padding="8,5">
+                        <WrapPanel VerticalAlignment="Center">
+                            <RadioButton x:Name="DefFilterRiskyRadio" Content="{DynamicResource Loc_Tab3_FilterRisky}" IsChecked="True"
+                                         Foreground="{DynamicResource TextStrongBrush}" FontWeight="SemiBold" FontSize="11.5" VerticalAlignment="Center" Margin="0,2,8,2"
+                                         Checked="DefenseFilter_Changed"/>
+                            <RadioButton x:Name="DefFilterAllRadio" Content="{DynamicResource Loc_Tab3_FilterAll}"
+                                         Foreground="{DynamicResource TextPrimaryBrush}" FontSize="11.5" VerticalAlignment="Center" Margin="0,2,8,2"
+                                         Checked="DefenseFilter_Changed"/>
+                            <RadioButton x:Name="DefFilterAutostartRadio" Content="{DynamicResource Loc_Tab3_FilterAutostart}"
+                                         Foreground="{DynamicResource TextPrimaryBrush}" FontSize="11.5" VerticalAlignment="Center" Margin="0,2,8,2"
+                                         Checked="DefenseFilter_Changed"/>
+                            <RadioButton x:Name="DefFilterCmdRadio" Content="{DynamicResource Loc_Tab3_FilterCmd}"
+                                         Foreground="{DynamicResource TextPrimaryBrush}" FontSize="11.5" VerticalAlignment="Center" Margin="0,2,8,2"
+                                         Checked="DefenseFilter_Changed"/>
+                            <RadioButton x:Name="DefFilterPrivacyRadio" Content="{DynamicResource Loc_Tab3_FilterPrivacy}"
+                                         Foreground="{DynamicResource TextPrimaryBrush}" FontSize="11.5" VerticalAlignment="Center" Margin="0,2,8,2"
+                                         Checked="DefenseFilter_Changed"/>
+                            <RadioButton x:Name="DefFilterCertAccountRadio" Content="{DynamicResource Loc_Tab3_FilterCert}"
+                                         Foreground="{DynamicResource TextPrimaryBrush}" FontSize="11.5" VerticalAlignment="Center" Margin="0,2,10,2"
+                                         Checked="DefenseFilter_Changed"/>
+
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,0,2">
+                                <TextBlock Text="🔎" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="11.5"/>
+                                <TextBox x:Name="DefenseSearchBox" Width="125" Padding="4,2" FontSize="11.5"
+                                         Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource BorderBrushSecondary}"
+                                         TextChanged="DefenseSearchBox_TextChanged"/>
+                                <TextBlock x:Name="DefenseCountText" Text="0"
+                                           Foreground="{DynamicResource TextAccentBrush}" FontWeight="Bold" FontSize="11.5" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                            </StackPanel>
+                        </WrapPanel>
+                    </Border>
+
+                    <!-- 下段: 検知一覧 DataGrid と 安全スコア10項目診断 DataGrid (切替表示) -->
+                    <Grid Grid.Row="2">
+                        <DataGrid x:Name="DefenseFindingsDataGrid" Visibility="Visible">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn x:Name="Col_Def_Severity" Header="Severity" Binding="{Binding SeverityBadge}" Width="82"/>
+                                <DataGridTextColumn x:Name="Col_Def_State" Header="State" Binding="{Binding StateBadge}" Width="75"/>
+                                <DataGridTextColumn x:Name="Col_Def_Cat" Header="Category" Binding="{Binding CategoryLabel}" Width="118"/>
+                                <DataGridTextColumn x:Name="Col_Def_Title" Header="Finding Title" Binding="{Binding Title}" Width="225"/>
+                                <DataGridTextColumn x:Name="Col_Def_Detail" Header="Details &amp; Evidence" Binding="{Binding Detail}" Width="*"/>
+                                <DataGridTextColumn x:Name="Col_Def_Target" Header="Target Path / ID" Binding="{Binding Target}" Width="175"/>
+                                <DataGridTextColumn x:Name="Col_Def_Time" Header="Time" Binding="{Binding LastSeenText}" Width="65"/>
+                                <DataGridTemplateColumn x:Name="Col_Def_Action" Header="Action" Width="180">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="{DynamicResource Loc_Btn_Ack}" Style="{StaticResource ModernButton}"
+                                                        Padding="5,1" FontSize="10.5" Margin="0,0,3,0"
+                                                        Click="AcknowledgeFindingButton_Click"/>
+                                                <Button Content="{DynamicResource Loc_Btn_OpenLoc}" Style="{StaticResource ModernButton}"
+                                                        Padding="5,1" FontSize="10.5" Margin="0,0,3,0"
+                                                        Click="OpenFindingLocationButton_Click"/>
+                                                <Button Content="{DynamicResource Loc_Btn_ToAi}" Style="{StaticResource ModernButton}"
+                                                        Padding="5,1" FontSize="10.5"
+                                                        Click="AddFindingToAiButton_Click"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <DataGrid x:Name="SecurityPostureDataGrid" Visibility="Collapsed">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn x:Name="Col_Post_Result" Header="Result" Binding="{Binding ResultBadge}" Width="90"/>
+                                <DataGridTextColumn x:Name="Col_Post_Weight" Header="Points" Binding="{Binding WeightText}" Width="80"/>
+                                <DataGridTextColumn x:Name="Col_Post_Name" Header="Security Check Item" Binding="{Binding Name}" Width="250"/>
+                                <DataGridTextColumn x:Name="Col_Post_Status" Header="Current Status" Binding="{Binding StatusText}" Width="220"/>
+                                <DataGridTextColumn x:Name="Col_Post_Advice" Header="Explanation &amp; Advice" Binding="{Binding Advice}" Width="*"/>
+                                <DataGridTemplateColumn x:Name="Col_Post_Fix" Header="Fix" Width="115">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="{DynamicResource Loc_Btn_OpenSetting}" Style="{StaticResource ModernButton}"
+                                                    Padding="6,1" FontSize="10.5"
+                                                    Click="OpenPostureFixButton_Click"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <!-- ====================================================================== -->
+            <!-- TAB 5: AIに相談すべきログ -->
+            <!-- ====================================================================== -->
+            <TabItem Header="{DynamicResource Loc_Tab4_Header}">
+                <Grid Background="{DynamicResource PanelBgBrush}" Margin="0,1,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1.1*" MinHeight="110"/>
+                        <RowDefinition Height="5"/>
+                        <RowDefinition Height="1*" MinHeight="120"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 上段: 相談すべきログ一覧 -->
+                    <Grid Grid.Row="0" Margin="6,6,6,2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <WrapPanel Grid.Row="0" Margin="0,0,0,5" VerticalAlignment="Center">
+                            <Button Content="{DynamicResource Loc_Tab4_AddSnapshotBtn}" Style="{StaticResource AccentButton}" Padding="8,2" FontSize="11" Margin="0,0,8,2" Click="AddSystemSnapshotLog_Click"/>
+                            <TextBlock Text="{DynamicResource Loc_Tab4_LogsTitle}" FontSize="12.5" FontWeight="Bold" Foreground="{DynamicResource TextStrongBrush}" VerticalAlignment="Center" Margin="0,0,8,2"/>
+                            <Button Content="{DynamicResource Loc_Tab4_SelectAllBtn}" Style="{StaticResource ModernButton}" Padding="6,2" FontSize="11" Margin="0,0,4,2" Click="SelectAllAiLogs_Click"/>
+                            <Button Content="{DynamicResource Loc_Tab4_DeselectAllBtn}" Style="{StaticResource ModernButton}" Padding="6,2" FontSize="11" Margin="0,0,4,2" Click="DeselectAllAiLogs_Click"/>
+                            <Button Content="{DynamicResource Loc_Tab4_ClearBtn}" Style="{StaticResource ModernButton}" Padding="6,2" FontSize="11" Margin="0,0,8,2" Click="ClearAiLogs_Click"/>
+                            <CheckBox x:Name="IncludeHistoryAiLogsCheckBox"
+                                      Content="{DynamicResource Loc_Tab4_IncludeHistory}"
+                                      ToolTip="{DynamicResource Loc_Tab4_IncludeHistoryTooltip}"
+                                      IsChecked="False"
+                                      VerticalAlignment="Center" Margin="10,0,0,2" FontSize="11.5"
+                                      Foreground="{DynamicResource TextStrongBrush}" FontWeight="SemiBold"
+                                      Click="IncludeHistoryAiLogsCheckBox_Click"/>
+                        </WrapPanel>
+
+                        <DataGrid x:Name="AiLogsDataGrid" Grid.Row="1" IsReadOnly="False">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn x:Name="Col_Ai_Select" Header="Select" Width="52">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                      Click="AiLogSelection_Changed"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn x:Name="Col_Ai_Sev" Header="Severity" Binding="{Binding SeverityLabel}" Width="105" IsReadOnly="True"/>
+                                <DataGridTextColumn x:Name="Col_Ai_Cat" Header="Category" Binding="{Binding CategoryLabel}" Width="125" IsReadOnly="True"/>
+                                <DataGridTextColumn x:Name="Col_Ai_Title" Header="Event Summary" Binding="{Binding Title}" Width="*" IsReadOnly="True"/>
+                                <DataGridTextColumn x:Name="Col_Ai_Count" Header="Count" Binding="{Binding OccurrenceCount}" Width="50" IsReadOnly="True"/>
+                                <DataGridTextColumn x:Name="Col_Ai_Time" Header="Time" Binding="{Binding TimestampText}" Width="68" IsReadOnly="True"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+
+                    <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="{DynamicResource BorderBrushPrimary}"/>
+
+                    <!-- 下段: AI相談用プロンプト自動生成＆ワンクリックコピー -->
+                    <Grid Grid.Row="2" Margin="6,4,6,6">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" Margin="0,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{DynamicResource Loc_Tab4_UserNoteLabel}" Foreground="{DynamicResource TextSubHeaderBrush}" VerticalAlignment="Center" Margin="0,0,6,0" FontSize="11.5"/>
+                            <TextBox x:Name="UserNoteTextBox" Grid.Column="1" Padding="5,2" FontSize="11.5"
+                                     Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource BorderBrushSecondary}"
+                                     Text="I haven't done anything unusual, but I want to verify if my background network connections and processes are safe."
+                                     TextChanged="PromptOptions_Changed"/>
+                        </Grid>
+
+                        <TextBox x:Name="AiPromptPreviewBox" Grid.Row="1"
+                                 Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource BorderBrushPrimary}" BorderThickness="1"
+                                 FontFamily="Consolas, Yu Gothic UI" FontSize="11.5"
+                                 Padding="8" IsReadOnly="True"
+                                 TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AcceptsReturn="True"/>
+
+                        <DockPanel Grid.Row="2" Margin="0,6,0,0">
+                            <Button DockPanel.Dock="Right" Style="{StaticResource AccentButton}"
+                                    Content="{DynamicResource Loc_Tab4_CopyPromptBtn}"
+                                    Padding="12,5" FontSize="12"
+                                    Click="CopyAiPromptButton_Click"/>
+                            <TextBlock x:Name="CopyStatusText"
+                                       Text="💡 Click button to copy prompt (Personal info masking: ON)"
+                                       Foreground="{DynamicResource TextAccentBrush}" FontWeight="SemiBold"
+                                       VerticalAlignment="Center" FontSize="11.5" TextTrimming="CharacterEllipsis" Margin="0,0,8,0"/>
+                        </DockPanel>
+                    </Grid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <!-- ==================== 4. COMPACT FOOTER STATUS BAR ==================== -->
+        <Border Grid.Row="3" Background="{DynamicResource HeaderBgBrush}" BorderBrush="{DynamicResource BorderBrushPrimary}" BorderThickness="0,1,0,0" Padding="10,4">
+            <DockPanel>
+                <TextBlock x:Name="FooterLastScanText" DockPanel.Dock="Right"
+                           Text="--:--:--"
+                           Foreground="{DynamicResource TextMutedBrush}" FontSize="11" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                <TextBlock x:Name="FooterStatusText"
+                           Text="🟢 Monitoring active (3s cycle)"
+                           Foreground="{DynamicResource TextMutedBrush}" FontSize="11" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>

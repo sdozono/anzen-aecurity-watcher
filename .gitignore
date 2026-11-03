@@ -1,0 +1,51 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+[Ll]og/
+[Ll]ogs/
+
+# Runtime generated data & personal environment baselines (IMPORTANT: Never commit)
+[Dd]ata/
+*_baseline.json
+geoip_cache.json
+acknowledged_findings.json
+selftest_report.txt
+
+# Visual Studio / .NET / Rider / VS Code cache & user files
+.vs/
+.vscode/
+.idea/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.nupkg
+*.snupkg
+
+# Debug symbols & crash dumps
+*.pdb
+*.wixpdb
+*.dmp
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Environment / secret files
+.env
+.env.*
+*.local
+
+# WiX Installer outputs & MSI
+installer/output/
+*.msi
+*.wixobj
+

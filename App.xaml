@@ -1,0 +1,32 @@
+<Application x:Class="AnzenSecurityWatcher.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:AnzenSecurityWatcher"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!-- 初期ブラシ定義（起動時に ThemeManager.ApplyTheme(AppThemeMode.System) でシステム設定に上書きされます） -->
+        <SolidColorBrush x:Key="WindowBgBrush" Color="#0F141C"/>
+        <SolidColorBrush x:Key="HeaderBgBrush" Color="#161D29"/>
+        <SolidColorBrush x:Key="PanelBgBrush" Color="#141B25"/>
+        <SolidColorBrush x:Key="SubPanelBgBrush" Color="#18202D"/>
+        <SolidColorBrush x:Key="CardBgBrush" Color="#1D2636"/>
+        <SolidColorBrush x:Key="InputBgBrush" Color="#0B0F15"/>
+        <SolidColorBrush x:Key="BorderBrushPrimary" Color="#283245"/>
+        <SolidColorBrush x:Key="BorderBrushSecondary" Color="#364156"/>
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#E6EDF3"/>
+        <SolidColorBrush x:Key="TextStrongBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#8B949E"/>
+        <SolidColorBrush x:Key="TextAccentBrush" Color="#58A6FF"/>
+        <SolidColorBrush x:Key="TextSubHeaderBrush" Color="#9ECBFF"/>
+        <SolidColorBrush x:Key="ButtonBgBrush" Color="#212836"/>
+        <SolidColorBrush x:Key="ButtonHoverBgBrush" Color="#2E384D"/>
+        <SolidColorBrush x:Key="TabInactiveBgBrush" Color="#161D29"/>
+        <SolidColorBrush x:Key="TabHoverBgBrush" Color="#212B3D"/>
+        <SolidColorBrush x:Key="GridRowBgBrush" Color="#141B25"/>
+        <SolidColorBrush x:Key="GridAltRowBgBrush" Color="#18202C"/>
+        <SolidColorBrush x:Key="GridHeaderBgBrush" Color="#1E2736"/>
+        <SolidColorBrush x:Key="GridLineBrush" Color="#222C3C"/>
+        <SolidColorBrush x:Key="GridSelectedBgBrush" Color="#264F78"/>
+        <SolidColorBrush x:Key="GridSelectedFgBrush" Color="#FFFFFF"/>
+    </Application.Resources>
+</Application>

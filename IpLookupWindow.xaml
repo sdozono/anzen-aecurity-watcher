@@ -1,0 +1,331 @@
+<Window x:Class="AnzenSecurityWatcher.IpLookupWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{DynamicResource Loc_IpLookup_Title}"
+        Width="600" Height="650"
+        MinWidth="520" MinHeight="500"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{DynamicResource WindowBgBrush}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        FontFamily="Yu Gothic UI, Segoe UI, sans-serif">
+
+    <Window.Resources>
+        <!-- 標準ダイアログボタンスタイル -->
+        <Style x:Key="DialogButton" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource ButtonBgBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushSecondary}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource ButtonHoverBgBrush}"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource TextAccentBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource ButtonBgBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- プライマリボタンスタイル（アクセントカラー） -->
+        <Style x:Key="PrimaryDialogButton" TargetType="Button" BasedOn="{StaticResource DialogButton}">
+            <Setter Property="Background" Value="#1F6FEB"/>
+            <Setter Property="BorderBrush" Value="#388BFD"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
+        <!-- 各脅威インテリジェンスサービス用カードボタンスタイル -->
+        <Style x:Key="ServiceButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource CardBgBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushPrimary}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,0,0,7"/>
+            <Setter Property="Padding" Value="12,9"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="cardBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="7"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="cardBorder" Property="Background" Value="{DynamicResource ButtonHoverBgBrush}"/>
+                                <Setter TargetName="cardBorder" Property="BorderBrush" Value="{DynamicResource TextAccentBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="cardBorder" Property="Background" Value="{DynamicResource ButtonBgBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- ヘッダー -->
+            <RowDefinition Height="Auto"/>
+            <!-- 調査対象IPカード -->
+            <RowDefinition Height="Auto"/>
+            <!-- サービスボタンリスト -->
+            <RowDefinition Height="*"/>
+            <!-- フッター -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 0. ヘッダー -->
+        <Border Grid.Row="0" Background="{DynamicResource HeaderBgBrush}" BorderBrush="{DynamicResource BorderBrushPrimary}" BorderThickness="0,0,0,1" Padding="16,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="🔍" FontSize="26" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="{DynamicResource Loc_IpLookup_Header}"
+                               FontSize="14.5" FontWeight="Bold" Foreground="{DynamicResource TextStrongBrush}"/>
+                    <TextBlock Text="{DynamicResource Loc_IpLookup_Desc}"
+                               FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 1. 調査対象IPカード -->
+        <Border Grid.Row="1" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrushPrimary}"
+                BorderThickness="1" CornerRadius="8" Padding="12" Margin="14,10,14,8">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{DynamicResource Loc_IpLookup_TargetIpLabel}"
+                               FontWeight="Bold" FontSize="12.5" Foreground="{DynamicResource TextSubHeaderBrush}"
+                               VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBox x:Name="TargetIpTextBox" Grid.Column="1"
+                             FontFamily="Consolas, monospace" FontSize="15" FontWeight="Bold"
+                             Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextAccentBrush}"
+                             BorderBrush="{DynamicResource BorderBrushSecondary}" BorderThickness="1"
+                             Padding="8,5" VerticalAlignment="Center"
+                             TextChanged="TargetIpTextBox_TextChanged"/>
+                    <Button x:Name="CopyIpButton" Grid.Column="2"
+                            Content="{DynamicResource Loc_IpLookup_CopyBtn}"
+                            Style="{StaticResource DialogButton}"
+                            Padding="12,5" Margin="8,0,0,0"
+                            VerticalAlignment="Center"
+                            Click="CopyIpButton_Click"/>
+                </Grid>
+
+                <!-- 接続付随情報（プロセス、国、組織、ポート等） -->
+                <WrapPanel x:Name="ConnectionInfoPanel" Margin="0,8,0,0" Visibility="Collapsed">
+                    <Border Background="{DynamicResource SubPanelBgBrush}" CornerRadius="4" Padding="6,2" Margin="0,0,6,4">
+                        <TextBlock x:Name="CountryInfoText" Text="🌐 Country" FontSize="11" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    </Border>
+                    <Border Background="{DynamicResource SubPanelBgBrush}" CornerRadius="4" Padding="6,2" Margin="0,0,6,4">
+                        <TextBlock x:Name="OrgInfoText" Text="🏢 Org / ISP" FontSize="11" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    </Border>
+                    <Border Background="{DynamicResource SubPanelBgBrush}" CornerRadius="4" Padding="6,2" Margin="0,0,6,4">
+                        <TextBlock x:Name="ProcessInfoText" Text="⚙️ Process" FontSize="11" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    </Border>
+                    <Border Background="{DynamicResource SubPanelBgBrush}" CornerRadius="4" Padding="6,2" Margin="0,0,6,4">
+                        <TextBlock x:Name="PortInfoText" Text="🔌 Port" FontSize="11" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    </Border>
+                </WrapPanel>
+
+                <!-- プライベートIP / ローカルIPの注意バナー -->
+                <Border x:Name="PrivateIpWarningBorder"
+                        Background="#261E14" BorderBrush="#D29922" BorderThickness="1"
+                        CornerRadius="6" Padding="10,6" Margin="0,8,0,0" Visibility="Collapsed">
+                    <TextBlock Text="{DynamicResource Loc_IpLookup_PrivateWarning}"
+                               Foreground="#F0C674" FontSize="11" TextWrapping="Wrap"/>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <!-- 2. サービスボタンリスト -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Padding="14,0,14,6">
+            <StackPanel>
+                <!-- 1. AbuseIPDB -->
+                <Button Style="{StaticResource ServiceButtonStyle}" Click="AbuseIpDbButton_Click">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="🚨" FontSize="19" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,8,0">
+                            <TextBlock Text="AbuseIPDB" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextStrongBrush}"/>
+                            <TextBlock Text="{DynamicResource Loc_Service_AbuseIpDb_Desc}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <Border Grid.Column="2" Background="{DynamicResource SubPanelBgBrush}" BorderBrush="{DynamicResource BorderBrushSecondary}" BorderThickness="1" CornerRadius="4" Padding="8,4" VerticalAlignment="Center">
+                            <TextBlock Text="Web ↗" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextAccentBrush}"/>
+                        </Border>
+                    </Grid>
+                </Button>
+
+                <!-- 2. GreyNoise -->
+                <Button Style="{StaticResource ServiceButtonStyle}" Click="GreyNoiseButton_Click">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="📡" FontSize="19" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,8,0">
+                            <TextBlock Text="GreyNoise" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextStrongBrush}"/>
+                            <TextBlock Text="{DynamicResource Loc_Service_GreyNoise_Desc}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <Border Grid.Column="2" Background="{DynamicResource SubPanelBgBrush}" BorderBrush="{DynamicResource BorderBrushSecondary}" BorderThickness="1" CornerRadius="4" Padding="8,4" VerticalAlignment="Center">
+                            <TextBlock Text="Web ↗" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextAccentBrush}"/>
+                        </Border>
+                    </Grid>
+                </Button>
+
+                <!-- 3. VirusTotal Public API -->
+                <Button Style="{StaticResource ServiceButtonStyle}" Click="VirusTotalButton_Click">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="🦠" FontSize="19" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,8,0">
+                            <TextBlock Text="VirusTotal Public API" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextStrongBrush}"/>
+                            <TextBlock Text="{DynamicResource Loc_Service_VirusTotal_Desc}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <Border Grid.Column="2" Background="{DynamicResource SubPanelBgBrush}" BorderBrush="{DynamicResource BorderBrushSecondary}" BorderThickness="1" CornerRadius="4" Padding="8,4" VerticalAlignment="Center">
+                            <TextBlock Text="Web ↗" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextAccentBrush}"/>
+                        </Border>
+                    </Grid>
+                </Button>
+
+                <!-- 4. LevelBlue OTX -->
+                <Button Style="{StaticResource ServiceButtonStyle}" Click="LevelBlueOtxButton_Click">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="🛡️" FontSize="19" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,8,0">
+                            <TextBlock Text="LevelBlue OTX" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextStrongBrush}"/>
+                            <TextBlock Text="{DynamicResource Loc_Service_LevelBlueOtx_Desc}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <Border Grid.Column="2" Background="{DynamicResource SubPanelBgBrush}" BorderBrush="{DynamicResource BorderBrushSecondary}" BorderThickness="1" CornerRadius="4" Padding="8,4" VerticalAlignment="Center">
+                            <TextBlock Text="Web ↗" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextAccentBrush}"/>
+                        </Border>
+                    </Grid>
+                </Button>
+
+                <!-- 5. Spamhaus -->
+                <Button Style="{StaticResource ServiceButtonStyle}" Click="SpamhausButton_Click">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="🚫" FontSize="19" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,8,0">
+                            <TextBlock Text="Spamhaus" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextStrongBrush}"/>
+                            <TextBlock Text="{DynamicResource Loc_Service_Spamhaus_Desc}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <Border Grid.Column="2" Background="{DynamicResource SubPanelBgBrush}" BorderBrush="{DynamicResource BorderBrushSecondary}" BorderThickness="1" CornerRadius="4" Padding="8,4" VerticalAlignment="Center">
+                            <TextBlock Text="Web ↗" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextAccentBrush}"/>
+                        </Border>
+                    </Grid>
+                </Button>
+
+                <!-- 6. Cisco Talos Reputation Center -->
+                <Button Style="{StaticResource ServiceButtonStyle}" Click="CiscoTalosButton_Click">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="🏢" FontSize="19" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,8,0">
+                            <TextBlock Text="Cisco Talos Reputation Center" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextStrongBrush}"/>
+                            <TextBlock Text="{DynamicResource Loc_Service_Talos_Desc}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <Border Grid.Column="2" Background="{DynamicResource SubPanelBgBrush}" BorderBrush="{DynamicResource BorderBrushSecondary}" BorderThickness="1" CornerRadius="4" Padding="8,4" VerticalAlignment="Center">
+                            <TextBlock Text="Web ↗" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextAccentBrush}"/>
+                        </Border>
+                    </Grid>
+                </Button>
+
+                <!-- 7. Censys -->
+                <Button Style="{StaticResource ServiceButtonStyle}" Click="CensysButton_Click">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="🔎" FontSize="19" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,8,0">
+                            <TextBlock Text="Censys" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextStrongBrush}"/>
+                            <TextBlock Text="{DynamicResource Loc_Service_Censys_Desc}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <Border Grid.Column="2" Background="{DynamicResource SubPanelBgBrush}" BorderBrush="{DynamicResource BorderBrushSecondary}" BorderThickness="1" CornerRadius="4" Padding="8,4" VerticalAlignment="Center">
+                            <TextBlock Text="Web ↗" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextAccentBrush}"/>
+                        </Border>
+                    </Grid>
+                </Button>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- 3. フッター -->
+        <Border Grid.Row="3" Background="{DynamicResource HeaderBgBrush}" BorderBrush="{DynamicResource BorderBrushPrimary}" BorderThickness="0,1,0,0" Padding="14,10">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="{DynamicResource Loc_IpLookup_OpenAllBtn}"
+                            Style="{StaticResource PrimaryDialogButton}"
+                            Padding="12,6"
+                            Click="OpenAllServicesButton_Click"/>
+                    <TextBlock x:Name="StatusMessageText" Text=""
+                               Foreground="{DynamicResource TextAccentBrush}" FontSize="11.5"
+                               VerticalAlignment="Center" Margin="12,0,0,0" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+                <Button DockPanel.Dock="Right" Content="{DynamicResource Loc_IpLookup_CloseBtn}"
+                        Style="{StaticResource DialogButton}"
+                        HorizontalAlignment="Right"
+                        Padding="16,6"
+                        Click="CloseButton_Click"/>
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>

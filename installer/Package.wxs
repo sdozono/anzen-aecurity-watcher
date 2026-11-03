@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+
+  <?ifndef PublishDir ?>
+    <?define PublishDir = "$(sys.SOURCEFILEDIR)..\bin\Release\net8.0-windows\publish" ?>
+  <?endif?>
+  <?ifndef ProjectRoot ?>
+    <?define ProjectRoot = "$(sys.SOURCEFILEDIR).." ?>
+  <?endif?>
+  <?ifndef ProductVersion ?>
+    <?define ProductVersion = "1.0.1.3" ?>
+  <?endif?>
+
+  <Package Name="Anzen Security Watcher"
+           Manufacturer="Anzen Security Project"
+           Version="$(var.ProductVersion)"
+           UpgradeCode="8D4E92A1-53C7-4B8F-9A14-7C62F18B3E90"
+           Language="1041"
+           Codepage="932"
+           Scope="perMachine"
+           Compressed="yes">
+
+    <SummaryInformation Description="Anzen Security Watcher - Windows 11 リアルタイム・セキュリティ監視＆AI診断支援ツール"
+                        Manufacturer="Anzen Security Project"
+                        Keywords="Security,Watcher,Network,Process,Firewall,Windows11"
+                        Codepage="932" />
+
+    <!-- 同一・旧バージョンからのメジャーアップグレード設定 -->
+    <MajorUpgrade DowngradeErrorMessage="より新しいバージョンの [ProductName] が既にインストールされています。"
+                  AllowSameVersionUpgrades="yes" />
+
+    <!-- CABをMSIファイル内部に埋め込み -->
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <!-- アプリケーションアイコン（プログラムの追加と削除・ショートカット用） -->
+    <Icon Id="AppIcon.ico" SourceFile="$(var.ProjectRoot)\Assets\app.ico" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon.ico" />
+    <Property Id="ARPCOMMENTS" Value="Windows 11 リアルタイム・セキュリティ監視＆AIログ診断ツール" />
+
+    <!-- インストール完了画面で「セットアップ終了後に起動する」チェックボックスを表示 -->
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="セットアップ終了後に Anzen Security Watcher を起動する" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    <Property Id="WixShellExecTarget" Value="[#MainExecutable]" />
+    <CustomAction Id="LaunchApplication"
+                  DllEntry="WixShellExec"
+                  Impersonate="yes"
+                  BinaryRef="Wix4UtilCA_$(sys.BUILDARCHSHORT)" />
+
+    <!-- WiX 標準UI (インストール先フォルダ選択付き) -->
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.ProjectRoot)\installer\License.rtf" />
+
+    <UI>
+      <Publish Dialog="ExitDialog"
+               Control="Finish"
+               Event="DoAction"
+               Value="LaunchApplication"
+               Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed" />
+    </UI>
+
+    <!-- ディレクトリ構造定義 -->
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="Anzen Security Watcher" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="Anzen Security Watcher" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="DesktopFolder" />
+
+    <!-- インストール機能定義 -->
+    <Feature Id="MainFeature"
+             Title="Anzen Security Watcher"
+             Description="Anzen Security Watcher 本体およびショートカットをインストールします。"
+             Level="1"
+             ConfigurableDirectory="INSTALLFOLDER"
+             AllowAbsent="no">
+      <ComponentGroupRef Id="AppComponents" />
+      <ComponentRef Id="StartMenuShortcutComponent" />
+      <ComponentRef Id="DesktopShortcutComponent" />
+    </Feature>
+
+    <!-- アプリ本体ファイル群 -->
+    <ComponentGroup Id="AppComponents" Directory="INSTALLFOLDER">
+      <!-- メイン実行ファイル -->
+      <Component Id="MainExecutableComponent" Bitness="always64">
+        <File Id="MainExecutable"
+              Source="$(var.PublishDir)\AnzenSecurityWatcher.exe"
+              KeyPath="yes" />
+      </Component>
+
+      <!-- README ドキュメント -->
+      <Component Id="ReadmeComponent" Bitness="always64">
+        <File Id="ReadmeFile"
+              Source="$(var.ProjectRoot)\README.md"
+              KeyPath="yes" />
+      </Component>
+
+      <!-- publish フォルダ内のその他すべてのファイル（DLL / deps.json / runtimeconfig.json 等）を自動収集 -->
+      <Files Include="$(var.PublishDir)\**">
+        <Exclude Files="$(var.PublishDir)\AnzenSecurityWatcher.exe" />
+        <Exclude Files="$(var.PublishDir)\*.pdb" />
+      </Files>
+    </ComponentGroup>
+
+    <!-- スタートメニューショートカット -->
+    <Component Id="StartMenuShortcutComponent" Directory="ApplicationProgramsFolder">
+      <Shortcut Id="ApplicationStartMenuShortcut"
+                Name="Anzen Security Watcher"
+                Description="Windows 11 リアルタイム・セキュリティ監視＆AI診断支援ツール"
+                Target="[#MainExecutable]"
+                WorkingDirectory="INSTALLFOLDER"
+                Icon="AppIcon.ico" />
+      <RemoveFolder Id="RemoveApplicationProgramsFolder" On="uninstall" />
+      <RegistryValue Root="HKCU"
+                     Key="Software\AnzenSecurityProject\AnzenSecurityWatcher"
+                     Name="StartMenuShortcutInstalled"
+                     Type="integer"
+                     Value="1"
+                     KeyPath="yes" />
+    </Component>
+
+    <!-- デスクトップショートカット -->
+    <Component Id="DesktopShortcutComponent" Directory="DesktopFolder">
+      <Shortcut Id="ApplicationDesktopShortcut"
+                Name="Anzen Security Watcher"
+                Description="Windows 11 リアルタイム・セキュリティ監視＆AI診断支援ツール"
+                Target="[#MainExecutable]"
+                WorkingDirectory="INSTALLFOLDER"
+                Icon="AppIcon.ico" />
+      <RegistryValue Root="HKCU"
+                     Key="Software\AnzenSecurityProject\AnzenSecurityWatcher"
+                     Name="DesktopShortcutInstalled"
+                     Type="integer"
+                     Value="1"
+                     KeyPath="yes" />
+    </Component>
+
+  </Package>
+</Wix>

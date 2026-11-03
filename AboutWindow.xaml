@@ -1,0 +1,228 @@
+<Window x:Class="AnzenSecurityWatcher.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{DynamicResource Loc_About_Title}"
+        Width="540" Height="580"
+        MinWidth="480" MinHeight="500"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{DynamicResource WindowBgBrush}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        FontFamily="Yu Gothic UI, Segoe UI, sans-serif">
+
+    <Window.Resources>
+        <!-- 標準ダイアログボタンスタイル -->
+        <Style x:Key="DialogButton" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource ButtonBgBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushSecondary}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="14,7"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource ButtonHoverBgBrush}"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource TextAccentBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource ButtonBgBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- プライマリボタンスタイル（アクセントカラー） -->
+        <Style x:Key="PrimaryDialogButton" TargetType="Button" BasedOn="{StaticResource DialogButton}">
+            <Setter Property="Background" Value="#1F6FEB"/>
+            <Setter Property="BorderBrush" Value="#388BFD"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <!-- ヘッダー（アプリアイコン・タイトル・バージョンバッジ） -->
+            <RowDefinition Height="Auto"/>
+            <!-- 概要説明カード -->
+            <RowDefinition Height="Auto"/>
+            <!-- 詳細スペック情報カード -->
+            <RowDefinition Height="*"/>
+            <!-- フッター（コピーライト・アクションボタン） -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ==================== 1. HEADER ==================== -->
+        <Border Grid.Row="0" Margin="0,0,0,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- アイコン画像（app.ico）またはシンボル -->
+                <Border Grid.Column="0" Width="60" Height="60" CornerRadius="12"
+                        Background="{DynamicResource CardBgBrush}"
+                        BorderBrush="{DynamicResource BorderBrushPrimary}"
+                        BorderThickness="1"
+                        Margin="0,0,16,0"
+                        VerticalAlignment="Center">
+                    <Grid>
+                        <!-- フォールバック表示用テキスト -->
+                        <TextBlock Text="🛡️" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Image x:Name="AppIconImage"
+                               Source="pack://application:,,,/Assets/app.ico"
+                               Width="44" Height="44"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                    </Grid>
+                </Border>
+
+                <!-- タイトル・バージョン・タグ -->
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,4">
+                        <TextBlock Text="Anzen Security Watcher"
+                                   FontSize="20" FontWeight="Bold"
+                                   Foreground="{DynamicResource TextStrongBrush}"
+                                   VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <Border Background="#1F6FEB" CornerRadius="10" Padding="8,2" VerticalAlignment="Center">
+                            <TextBlock x:Name="VersionBadgeText" Text="v1.0.0" FontSize="11" FontWeight="Bold" Foreground="White"/>
+                        </Border>
+                    </StackPanel>
+                    <TextBlock Text="{DynamicResource Loc_About_AppDescription}"
+                               FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ==================== 2. DESCRIPTION & STATUS BANNER ==================== -->
+        <Border Grid.Row="1" Background="{DynamicResource CardBgBrush}"
+                BorderBrush="{DynamicResource BorderBrushPrimary}"
+                BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,14">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="🛡️" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <TextBlock x:Name="ProtectionStatusText"
+                           Text="Windows 11 NT Native API / C# .NET 8 WPF Security Engine"
+                           FontSize="12" Foreground="{DynamicResource TextAccentBrush}"
+                           FontWeight="SemiBold" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- ==================== 3. SYSTEM & RUNTIME INFO GRID ==================== -->
+        <Border Grid.Row="2" Background="{DynamicResource CardBgBrush}"
+                BorderBrush="{DynamicResource BorderBrushPrimary}"
+                BorderThickness="1" CornerRadius="8" Padding="16,12" Margin="0,0,0,16">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Version -->
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{DynamicResource Loc_About_Version}"
+                               FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,5,10,5"/>
+                    <TextBlock x:Name="FullVersionText" Grid.Row="0" Grid.Column="1" Text="1.0.0.0"
+                               FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,5,0,5"/>
+
+                    <!-- .NET Runtime -->
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{DynamicResource Loc_About_Runtime}"
+                               FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,5,10,5"/>
+                    <TextBlock x:Name="DotNetRuntimeText" Grid.Row="1" Grid.Column="1" Text=".NET 8.0"
+                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,5,0,5"/>
+
+                    <!-- OS -->
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{DynamicResource Loc_About_OS}"
+                               FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,5,10,5"/>
+                    <TextBlock x:Name="OsDescriptionText" Grid.Row="2" Grid.Column="1" Text="Windows 11"
+                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,5,0,5" TextWrapping="Wrap"/>
+
+                    <!-- Architecture -->
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="{DynamicResource Loc_About_Architecture}"
+                               FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,5,10,5"/>
+                    <TextBlock x:Name="ArchitectureText" Grid.Row="3" Grid.Column="1" Text="X64 (64-bit)"
+                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,5,0,5"/>
+
+                    <!-- Privilege -->
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="{DynamicResource Loc_About_Privilege}"
+                               FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,5,10,5"/>
+                    <TextBlock x:Name="PrivilegeLevelText" Grid.Row="4" Grid.Column="1" Text="Standard User"
+                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,5,0,5"/>
+
+                    <!-- License -->
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="{DynamicResource Loc_About_License}"
+                               FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,5,10,5"/>
+                    <TextBlock Text="{DynamicResource Loc_About_LicenseType}" Grid.Row="5" Grid.Column="1"
+                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,5,0,5"/>
+
+                    <!-- Project -->
+                    <TextBlock Grid.Row="6" Grid.Column="0" Text="{DynamicResource Loc_About_Developer}"
+                               FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,5,10,5"/>
+                    <TextBlock Text="Anzen Security Project" Grid.Row="6" Grid.Column="1"
+                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,5,0,5"/>
+
+                    <!-- GitHub Repository -->
+                    <TextBlock Grid.Row="7" Grid.Column="0" Text="{DynamicResource Loc_About_GitHub}"
+                               FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,5,10,5"/>
+                    <TextBlock Grid.Row="7" Grid.Column="1" Margin="0,5,0,5">
+                        <Hyperlink x:Name="GitHubHyperlink" NavigateUri="https://github.com/sdozono/Anzen-Security-Watcher"
+                                   RequestNavigate="GitHubHyperlink_RequestNavigate"
+                                   Foreground="{DynamicResource TextAccentBrush}">
+                            github.com/sdozono/Anzen-Security-Watcher
+                        </Hyperlink>
+                    </TextBlock>
+                </Grid>
+            </ScrollViewer>
+        </Border>
+
+        <!-- ==================== 4. FOOTER ==================== -->
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- コピーライト表記 -->
+            <TextBlock Grid.Column="0" Text="{DynamicResource Loc_About_Copyright}"
+                       FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
+                       VerticalAlignment="Center"/>
+
+            <!-- アクションボタン -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="{DynamicResource Loc_About_CopyInfo}"
+                        Style="{StaticResource DialogButton}"
+                        Margin="0,0,10,0"
+                        Click="CopyInfoButton_Click"/>
+                <Button Content="{DynamicResource Loc_About_Close}"
+                        Style="{StaticResource PrimaryDialogButton}"
+                        IsDefault="True" IsCancel="True"
+                        Click="CloseButton_Click"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

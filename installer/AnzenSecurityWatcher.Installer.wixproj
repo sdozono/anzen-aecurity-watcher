@@ -1,0 +1,17 @@
+<Project Sdk="WixToolset.Sdk/5.0.2">
+  <PropertyGroup>
+    <OutputName>AnzenSecurityWatcher-Setup-1.0.0-x64</OutputName>
+    <OutputType>Package</OutputType>
+    <InstallerPlatform>x64</InstallerPlatform>
+    <Cultures>ja-JP</Cultures>
+    <PublishDir Condition="'$(PublishDir)' == ''">..\bin\Release\net8.0-windows\publish</PublishDir>
+    <ProjectRoot Condition="'$(ProjectRoot)' == ''">..</ProjectRoot>
+    <ProductVersion Condition="'$(ProductVersion)' == ''">1.0.0.0</ProductVersion>
+    <DefineConstants>PublishDir=$(PublishDir);ProjectRoot=$(ProjectRoot);ProductVersion=$(ProductVersion)</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
+  </ItemGroup>
+</Project>
